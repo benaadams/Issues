@@ -65,10 +65,13 @@ namespace TheAwaitingGame
         [Benchmark(Description = "Sync", Baseline = true)]
         public int Sync() => _book.GetTotalQuantity();
 
-        [Benchmark(Description = "ValueTaskAsync")]
+        [Benchmark(Description = "ValueTask Pure Async")]
+        public ValueTask<int> ValueTaskPureAsync() => _book.GetTotalQuantityPureAsync();
+
+        [Benchmark(Description = "ValueTask + Local Async via Params")]
         public ValueTask<int> ValueTaskAsync() => _book.GetTotalQuantityAsync();
 
-        [Benchmark(Description = "ValueTaskAsync w Locals")]
+        [Benchmark(Description = "ValueTask + Local Async via Locals")]
         public ValueTask<int> ValueTaskLocalsAsync() => _book.GetTotalQuantityLocalsAsync();
     }
 
@@ -82,6 +85,16 @@ namespace TheAwaitingGame
             for (int i = 0; i < Orders.Count; i++)
             {
                 total += Orders[i].GetOrderQuantity();
+            }
+            return total;
+        }
+
+        public async ValueTask<int> GetTotalQuantityPureAsync()
+        {
+            int total = 0;
+            for (int i = 0; i < Orders.Count; i++)
+            {
+                total += await Orders[i].GetOrderQuantityPureAsync();
             }
             return total;
         }
@@ -145,6 +158,15 @@ namespace TheAwaitingGame
             for (var i = 0; i < Lines.Count; i++)
             {
                 total += Lines[i].GetLineQuantity();
+            }
+            return total;
+        }
+        public async ValueTask<int> GetOrderQuantityPureAsync()
+        {
+            int total = 0;
+            for (var i = 0; i < Lines.Count; i++)
+            {
+                total += await Lines[i].GetLineQuantityAsync();
             }
             return total;
         }
